@@ -1,0 +1,52 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  content:
+    name: Build content
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        submodules: true
+
+    - name: Install
+      shell: powershell
+      run: |
+        Invoke-WebRequest "https://gpuopen.com/wp-content/uploads/2017/02/GPUShaderAnalyzerv1.59.0.3208.msi" -OutFile "amd_shader_analyzer.exe"
+        cmd /c start /wait msiexec /i "amd_shader_analyzer.exe" /quiet /qn /norestart /log E:\install.log INSTALLDIR=C:\AMD
+
+    # TODO: Requires latte-assembler
+    # - name: Configure (Windows)
+    #   if: startsWith(matrix.os, 'windows')
+    #   shell: cmd
+    #   run: |
+    #     mkdir build
+    #     cd build
+    #     cmake ../content -DLATTE_ASSEMBLER=E:\wiiu\projects\decaf-emu\build\obj\RelWithDebInfo\latte-assembler.exe -DAMD_SHADER_ANALYZER=C:\AMD\GPUShaderAnalyzer.exe -DCMAKE_INSTALL_PREFIX=install
+
+  binaries:
+    name: Build binaries
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        submodules: true
+
+    - name: Install
+      run: |
+        wget https://github.com/devkitPro/pacman/releases/download/devkitpro-pacman-1.0.1/devkitpro-pacman.deb -O /tmp/devkitpro-pacman.deb
+        sudo dpkg -i /tmp/devkitpro-pacman.deb
+        yes | sudo dkp-pacman -Syu --needed devkitPPC wut-tools wut
+        echo ::set-env name=DEVKITPRO::/opt/devkitpro
+        echo ::set-env name=DEVKITPPC::/opt/devkitpro/devkitPPC
+        echo ::set-env name=PATH::/opt/devkitpro/tools/bin:$PATH
+
+    - name: Build
+      run: |
+        mkdir build && cd build
+        cmake -DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/wut/share/wut.toolchain.cmake ../src
+        make -j2
