@@ -16,16 +16,25 @@ jobs:
       shell: powershell
       run: |
         Invoke-WebRequest "https://gpuopen.com/wp-content/uploads/2017/02/GPUShaderAnalyzerv1.59.0.3208.msi" -OutFile "amd_shader_analyzer.exe"
-        cmd /c start /wait msiexec /i "amd_shader_analyzer.exe" /quiet /qn /norestart /log E:\install.log INSTALLDIR=C:\AMD
+        msiexec /i "amd_shader_analyzer.exe" /quiet /qn /norestart /log C:\amd_install.log INSTALLDIR=C:\AMD
+        Invoke-WebRequest "https://github.com/decaf-emu/latte-assembler/releases/download/v0.1/windows.zip" -OutFile "latte-assembler.zip"
+        7z e -oC:/latte-assembler latte-assembler.zip
+        dir C:\AMD
+        dir C:\latte-assembler
 
-    # TODO: Requires latte-assembler
-    # - name: Configure (Windows)
-    #   if: startsWith(matrix.os, 'windows')
-    #   shell: cmd
-    #   run: |
-    #     mkdir build
-    #     cd build
-    #     cmake ../content -DLATTE_ASSEMBLER=E:\wiiu\projects\decaf-emu\build\obj\RelWithDebInfo\latte-assembler.exe -DAMD_SHADER_ANALYZER=C:\AMD\GPUShaderAnalyzer.exe -DCMAKE_INSTALL_PREFIX=install
+    - name: Configure (Windows)
+      shell: cmd
+      run: |
+        mkdir build
+        cd build
+        cmake ../content -DLATTE_ASSEMBLER=C:/latte-assembler/latte-assembler.exe -DAMD_SHADER_ANALYZER=C:/AMD/GPUShaderAnalyzer.exe -DCMAKE_INSTALL_PREFIX=install -G "Unix Makefiles"
+        make install -j2
+
+    - name: Archive content
+      uses: actions/upload-artifact@v1
+      with:
+        name: content
+        path: build/install
 
   binaries:
     name: Build binaries
@@ -43,10 +52,16 @@ jobs:
         yes | sudo dkp-pacman -Syu --needed devkitPPC wut-tools wut
         echo ::set-env name=DEVKITPRO::/opt/devkitpro
         echo ::set-env name=DEVKITPPC::/opt/devkitpro/devkitPPC
-        echo ::set-env name=PATH::/opt/devkitpro/tools/bin:$PATH
+        echo ::set-env name=PATH::/opt/devkitpro/tools/bin:/opt/devkitpro/devkitPPC/bin:$PATH
 
     - name: Build
       run: |
         mkdir build && cd build
-        cmake -DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/wut/share/wut.toolchain.cmake ../src
-        make -j2
+        cmake -DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/wut/share/wut.toolchain.cmake ../src -DCMAKE_INSTALL_PREFIX=install
+        make install -j2
+
+    - name: Archive binaries
+      uses: actions/upload-artifact@v1
+      with:
+        name: binaries
+        path: build/install
