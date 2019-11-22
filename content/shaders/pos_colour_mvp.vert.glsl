@@ -9,6 +9,7 @@ varying vec4 outcolour;
 
 void main()
 {
-   gl_Position = vec4(position, 1.0f) * modelMatrix * viewMatrix * projectionMatrix;
+   gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0f);
+   gl_PointSize = 4.0f;
    outcolour = colour;
 }
