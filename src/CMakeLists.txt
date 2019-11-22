@@ -14,7 +14,7 @@ macro(add_rpx source)
    get_filename_component(target ${source} NAME_WE)
    add_executable(${target} ${source})
    target_link_libraries(${target} m)
-   wut_create_rpx(${target}.rpx ${target})
+   wut_create_rpx(${target})
    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${target}.rpx" DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
 endmacro()
 
