@@ -16,7 +16,7 @@ int main(int argc, char **argv)
    FSInitCmdBlock(&cmdBlock);
 
    test_report("Open file");
-   status = FSOpenFile(&client, &cmdBlock, "/vol/content/short_text.txt", "r", &fh, -1);
+   status = FSOpenFile(&client, &cmdBlock, "/vol/content/data/short_text.txt", "r", &fh, -1);
    test_report("FSOpenFile status: %d fh: %u", status, fh);
    test_eq(status, 0);
 
