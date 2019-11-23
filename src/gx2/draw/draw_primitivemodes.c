@@ -45,17 +45,6 @@ sColourData[] =
     1.0f,  0.0f,  1.0f, 1.0f,
 };
 
-/*
-   GX2_PRIMITIVE_MODE_LINES_ADJACENCY           = 10,
-   GX2_PRIMITIVE_MODE_LINE_STRIP_ADJACENCY      = 11,
-   GX2_PRIMITIVE_MODE_TRIANGLES_ADJACENCY       = 12,
-   GX2_PRIMITIVE_MODE_TRIANGLE_STRIP_ADJACENCY  = 13,
-
-   GX2_PRIMITIVE_MODE_RECTS                     = 17,
-   GX2_PRIMITIVE_MODE_QUADS                     = 19,
-   GX2_PRIMITIVE_MODE_QUAD_STRIP                = 20,
- */
-
 static int alignas(GX2_INDEX_BUFFER_ALIGNMENT)
 sIndicesPoints[] = { 0, 1, 2, 3 };
 
