@@ -3,6 +3,8 @@ project(content NONE)
 
 set(CONTENT_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/content")
 
-add_subdirectory(shaders)
+if(WIIU_TEST_GX2)
+   add_subdirectory(shaders)
+endif()
 
 install(DIRECTORY data DESTINATION "${CONTENT_INSTALL_DIR}")

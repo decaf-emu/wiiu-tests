@@ -18,5 +18,10 @@ macro(add_rpx source)
    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${target}.rpx" DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
 endmacro()
 
-add_subdirectory(coreinit)
-add_subdirectory(gx2)
+if(WIIU_TEST_COREINIT)
+   add_subdirectory(coreinit)
+endif()
+
+if(WIIU_TEST_GX2)
+   add_subdirectory(gx2)
+endif()
